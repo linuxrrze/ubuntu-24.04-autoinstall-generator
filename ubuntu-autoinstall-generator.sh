@@ -1,6 +1,14 @@
 #!/bin/bash
 set -Eeuo pipefail
 
+#UBUNTU_VERSION=22.04
+#UBUNTU_RELNAME="Jammy Jellyfish"
+#UBUNTU_REL="jammy"
+
+UBUNTU_VERSION=24.04
+UBUNTU_RELNAME="Noble Numbat"
+UBUNTU_REL="noble"
+
 function cleanup() {
         trap - SIGINT SIGTERM ERR EXIT
         if [ -n "${tmpdir+x}" ]; then
@@ -29,7 +37,7 @@ usage() {
         cat <<EOF
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-a] [-e] [-u user-data-file] [-m meta-data-file] [-k] [-c] [-r] [-s source-iso-file] [-d destination-iso-file]
 
-💁 This script will create fully-automated Ubuntu 22.04 Jammy Jellyfish installation media.
+💁 This script will create fully-automated Ubuntu ${UBUNTU_VERSION} ${UBUNTU_RELNAME} installation media.
 
 Available options:
 
@@ -40,7 +48,7 @@ Available options:
                         autoinstall user-data and meta-data files.
                         For more information see: https://ubuntu.com/server/docs/install/autoinstall-quickstart
 -e, --use-hwe-kernel    Force the generated ISO to boot using the hardware enablement (HWE) kernel. Not supported
-                        by early Ubuntu 22.04 release ISOs.
+                        by early Ubuntu ${UBUNTU_VERSION} release ISOs.
 -u, --user-data         Path to user-data file. Required if using -a
 -m, --meta-data         Path to meta-data file. Will be an empty file if not specified and using -a
 -k, --no-verify         Disable GPG verification of the source ISO file. By default SHA256SUMS-$today and
@@ -51,7 +59,7 @@ Available options:
 -c, --no-md5            Disable MD5 checksum on boot
 -r, --use-release-iso   Use the current release ISO instead of the daily ISO. The file will be used if it already
                         exists.
--s, --source            Source ISO file. By default the latest daily ISO for Ubuntu 22.04 will be downloaded
+-s, --source            Source ISO file. By default the latest daily ISO for Ubuntu ${UBUNTU_VERSION} will be downloaded
                         and saved as ${script_dir}/ubuntu-original-$today.iso
                         That file will be used by default if it already exists.
 -d, --destination       Destination ISO file. By default ${script_dir}/ubuntu-autoinstall-$today.iso will be
@@ -64,8 +72,8 @@ function parse_params() {
         # default values of variables set from params
         user_data_file=''
         meta_data_file=''
-        download_url="https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current"
-        download_iso="jammy-live-server-amd64.iso"
+        download_url="https://cdimage.ubuntu.com/ubuntu-server/${UBUNTU_REL}/daily-live/current"
+        download_iso="${UBUNTU_REL}-live-server-amd64.iso"
         original_iso="ubuntu-original-$today.iso"
         source_iso="${script_dir}/${original_iso}"
         destination_iso="${script_dir}/ubuntu-autoinstall-$today.iso"
@@ -121,7 +129,7 @@ function parse_params() {
         fi
 
         if [ "${use_release_iso}" -eq 1 ]; then
-                download_url="https://releases.ubuntu.com/jammy"
+                download_url="https://releases.ubuntu.com/${UBUNTU_REL}"
                 log "🔎 Checking for current release..."
                 download_iso=$(curl -sSL "${download_url}" | grep -oP 'ubuntu-20\.04\.\d*-live-server-amd64\.iso' | head -n 1)
                 original_iso="${download_iso}"
@@ -159,7 +167,7 @@ log "🔎 Checking for required utilities..."
 log "👍 All required utilities are installed."
 
 if [ ! -f "${source_iso}" ]; then
-        log "🌎 Downloading ISO image for Ubuntu 22.04 Jammy Jellyfish..."
+        log "🌎 Downloading ISO image for Ubuntu ${UBUNTU_VERSION} ${UBUNTU_RELNAME}..."
         curl -NsSL "${download_url}/${download_iso}" -o "${source_iso}"
         log "👍 Downloaded and saved to ${source_iso}"
 else
