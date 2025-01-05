@@ -190,7 +190,7 @@ if [ ${gpg_verify} -eq 1 ]; then
 
         if [ ! -f "${script_dir}/${ubuntu_gpg_key_id}.keyring" ]; then
                 log "🌎 Downloading and saving Ubuntu signing key..."
-                gpg -q --no-default-keyring --keyring "${script_dir}/${ubuntu_gpg_key_id}.keyring" --keyserver "hkp://keyserver.ubuntu.com" --recv-keys "${ubuntu_gpg_key_id}"
+                gpg -q --no-default-keyring --keyring "${script_dir}/${ubuntu_gpg_key_id}.keyring" --keyserver "hkps://keyserver.ubuntu.com" --recv-keys "${ubuntu_gpg_key_id}"
                 log "👍 Downloaded and saved to ${script_dir}/${ubuntu_gpg_key_id}.keyring"
         else
                 log "☑️ Using existing Ubuntu signing key saved in ${script_dir}/${ubuntu_gpg_key_id}.keyring"
